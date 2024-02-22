@@ -13,7 +13,6 @@ const getEventos = async (req, res = response) => {
 const crearEvento = async (req, res = response) => {
   try {
     const nuevoEvento  = new evento(req.body);
-
     nuevoEvento.user = req.uid;
 
     const eventoGuardado = await nuevoEvento.save();
@@ -32,23 +31,24 @@ const crearEvento = async (req, res = response) => {
 };
 
 const actualizarEvento = async (req, res = response) => {
-  const eventoId = req.params.id;
-  const uid = req.uid;
 
-  try {
-    const Evento = await evento.findById(eventoId);
+  try{
+    const eventoId = req.params.id;
+    const uid = req.uid;
 
-    if (!Evento) {
+    const eventoExistente = await evento.findById(eventoId); // Cambiado a minúscula
+
+    if (!eventoExistente) {
       return res.status(404).json({
         ok: false,
-        msg: "el evento no existe por ese id ",
+        msg: 'El evento no existe por ese id',
       });
     }
 
-    if (Evento.user.toString() !== uid) {
+    if (eventoExistente.user.toString() !== uid) {
       return res.status(401).json({
         ok: false,
-        msg: "No tiene la autorizacion de editar este evento",
+        msg: 'No tiene la autorización de editar este evento',
       });
     }
 
@@ -65,13 +65,13 @@ const actualizarEvento = async (req, res = response) => {
 
     res.json({
       ok: true,
-      Evento: eventoActualizado,
+      evento: eventoActualizado,
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       ok: false,
-      msg: "hable con el administrador",
+      msg: 'Hable con el administrador',
     });
   }
 };
